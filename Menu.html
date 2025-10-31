@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>성적관리 사이트</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      background: #fff;
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-bottom: 1px solid #d2e1ed;
+      padding: 32px 60px 14px 60px;
+      margin-bottom: 30px;
+      box-sizing: border-box;
+    }
+
+    .logo-title {
+      font-size: 2.8em;
+      font-weight: bold;
+      letter-spacing: -2px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: flex-end;
+      gap: 30px;
+    }
+
+    .nav-menu a {
+      color: #222;
+      text-decoration: none;
+      font-size: 1.13em;
+      padding: 2px 12px 0 12px;
+      border-bottom: 1.5px dotted #bbb;
+      border-radius: 0;
+      background: none;
+      transition: background 0.13s;
+    }
+
+    .nav-menu a:hover {
+      background: #e9f1ff;
+    }
+
+    .searchbox {
+      max-width: 540px;
+      margin: 30px auto 0 auto;
+    }
+
+    .semester-box {
+      margin: 42px auto 0 auto;
+      max-width: 900px;
+      border: 1.5px solid #222;
+      border-radius: 7px;
+      background: #fafbfe;
+    }
+
+    .semester-title {
+      font-size: 2em;
+      font-weight: bold;
+      padding: 26px 18px 12px 32px;
+    }
+
+    .side-btn-area {
+      text-align: right;
+      padding-right: 28px;
+      margin-top: -15px;
+    }
+
+    .side-btn-area button {
+      background: #3577e7;
+      color: #fff;
+      border-radius: 5px;
+      border: none;
+      padding: 6px 20px;
+      font-size: 1.07em;
+      cursor: pointer;
+    }
+
+    table.this-semester-table {
+      width: 98%;
+      margin: 16px auto 24px auto;
+      border-collapse: collapse;
+    }
+
+    .this-semester-table th,
+    .this-semester-table td {
+      border: 1.2px solid #222;
+      padding: 13px 8px;
+      font-size: 1.1em;
+      text-align: center;
+      min-width: 90px;
+    }
+
+    .this-semester-table th {
+      background: #f2f2f5;
+    }
+
+    .empty-row {
+      color: #bbb;
+    }
+
+    #semester-input-popup {
+      display: none;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 2px solid #3577e7;
+      z-index: 99;
+      padding: 28px 30px 22px 30px;
+      border-radius: 16px;
+      box-shadow: 0px 8px 21px #0002;
+    }
+
+    #semester-input-popup form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 16px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #semester-input-popup label {
+      min-width: 78px;
+    }
+
+    #semester-input-popup input,
+    #semester-input-popup select {
+      font-size: 1em;
+      padding: 5px 12px;
+      min-width: 74px;
+      border-radius: 5px;
+      border: 1.2px solid #218;
+    }
+
+    #semester-input-popup .popup-btn-area {
+      width: 100%;
+      text-align: center;
+      margin-top: 18px;
+    }
+
+    #semester-input-popup .popup-btn-area button {
+      margin: 0 6px;
+      padding: 7px 24px;
+      border: none;
+      border-radius: 6px;
+    }
+
+    #btn-close-popup {
+      background: #aaa;
+      color: #fff;
+    }
+
+    #btn-sem-save {
+      background: #3577e7;
+      color: #fff;
+    }
+
+    #popup-dim {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.13);
+      z-index: 98;
+    }
+
+    #gradSummaryWrap {
+      max-width: 720px;
+      margin: 24px auto;
+      border: 1.5px solid #bbc;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    #gradSummaryTbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1.16em;
+      table-layout: fixed;
+    }
+
+    #gradSummaryTbl th {
+      font-weight: bold;
+    }
+
+    #gradSummaryTbl th,
+    #gradSummaryTbl td {
+      text-align: center;
+      padding: 8px;
+    }
+
+    #gradSummaryTbl td {
+      font-family: 'Consolas', 'Monaco', 'monospace';
+      font-size: 1.08em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header-bar">
+    <div class="logo-title">성적 관리</div>
+    <nav class="nav-menu">
+      <a href="Menu.html">홈</a>
+      <a href="Detail Grade.html">성적상세</a>
+      <a href="Enter Grade.html">성적입력</a>
+    </nav>
+  </div>
+  <div style="text-align:center; margin-top:28px;">
+    <a href="https://www.scnu.ac.kr/SCNU/na/ntt/selectNttList.do?mi=1131&bbsId=1040" target="_blank">
+      <button type="button"
+        style="background:#2946e3; color:#fff; font-size:1.09em; padding:7px 20px; border:none; border-radius:8px; cursor:pointer;">
+        학교 공지사항 바로가기
+      </button>
+    </a>
+  </div>
+  <div class="semester-box">
+    <div class="semester-title">이번학기 과목</div>
+    <div class="side-btn-area">
+      <button onclick="showSemesterPopup()">이번학기 성적입력</button>
+    </div>
+    <table class="this-semester-table">
+      <thead>
+        <tr>
+          <th>과목명</th>
+          <th>이수구분</th>
+          <th>학점</th>
+          <th>관리</th>
+        </tr>
+      </thead>
+      <tbody id="semesterTbody"></tbody>
+    </table>
+  </div>
+  <div id="popup-dim"></div>
+  <div id="semester-input-popup">
+    <form id="semesterForm" autocomplete="off">
+      <label>과목명 <input id="popup-subject" required></label>
+      <label>이수구분
+        <select id="popup-division" required>
+          <option value="">선택</option>
+          <option>기초교양</option>
+          <option>핵심교양</option>
+          <option>창의교양</option>
+          <option>전공필수</option>
+          <option>전공선택</option>
+          <option>기타</option>
+        </select>
+      </label>
+      <label>학점 <input id="popup-credit" type="number" min="0" required></label>
+      <div class="popup-btn-area">
+        <button id="btn-sem-save" type="submit">저장</button>
+        <button id="btn-close-popup" type="button" onclick="closeSemesterPopup()">닫기</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="searchbox">
+    <label for="dept-search">학과 검색</label>
+    <input id="dept-search" type="text" list="dept-options" autocomplete="off" placeholder="학과명을 입력하세요"
+      style="width: 260px; padding:7px;">
+    <datalist id="dept-options"></datalist>
+    <button style="margin-left:12px;"
+      onclick="if(confirm('모든 성적을 초기화할까요?')) { localStorage.removeItem('grades'); localStorage.removeItem('thisSemesterGrades'); location.reload(); }">
+      성적 전체 초기화
+    </button>
+  </div>
+
+  <!-- ======= 누적 현황 요약표(검색결과 반영) ====== -->
+  <div id="gradSummaryWrap">
+    <table id="gradSummaryTbl">
+      <thead>
+        <tr>
+          <th style="width:11%;">기초교양</th>
+          <th style="width:11%;">핵심교양</th>
+          <th style="width:11%;">창의교양</th>
+          <th style="width:12%;">전공필수</th>
+          <th style="width:12%;">전공선택</th>
+          <th style="width:18%;">총 누적학점/졸업학점</th>
+          <th style="width:13%;">전체평점</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="req-basic"></td>
+          <td id="req-core"></td>
+          <td id="req-creative"></td>
+          <td id="req-major-req"></td>
+          <td id="req-major-elec"></td>
+          <td id="req-total"></td>
+          <td id="req-gpa"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <script src="departments.js"></script>
+  <script>
+    // 학점 변환테이블
+    const gradeScore = { "A+": 4.5, "A": 4.0, "B+": 3.5, "B": 3.0, "C+": 2.5, "C": 2.0, "D+": 1.5, "D": 1.0, "F": 0 };
+    // 학과검색 자동완성
+    const input = document.getElementById('dept-search');
+    const datalist = document.getElementById('dept-options');
+    const allDepts = window.DEPT_LIST;
+    allDepts.forEach(dept => {
+      const option = document.createElement("option");
+      option.value = dept;
+      datalist.appendChild(option);
+    });
+    let deptName = localStorage.getItem('lastDeptName') || allDepts[0];
+    input.value = deptName;
+    input.addEventListener('input', function () {
+      deptName = this.value;
+      localStorage.setItem('lastDeptName', deptName);
+      renderSummary();
+    });
+    // 요약표
+    function renderSummary() {
+      const req = window.DEPT_REQS[deptName] || { "기초교양": 0, "핵심교양": 0, "창의교양": 0, "전공필수": 0, "전공선택": 0, "졸업인정학점": 0 };
+      let inputs = JSON.parse(localStorage.getItem('grades') || "[]");
+      let sum = { "기초교양": 0, "핵심교양": 0, "창의교양": 0, "전공필수": 0, "전공선택": 0 };
+      let tCredit = 0, tScore = 0;
+      inputs.forEach(d => {
+        if (sum[d.division] !== undefined) sum[d.division] += Number(d.credit);
+        tCredit += Number(d.credit); // <--- 중요: grade와 무관하게 credit 항상 누적!
+        if (gradeScore[d.grade] !== undefined) {
+          tScore += gradeScore[d.grade] * Number(d.credit);
+        }
+      });
+      document.getElementById('req-basic').textContent = `${sum["기초교양"] || 0} / ${req["기초교양"] || 0}`;
+      document.getElementById('req-core').textContent = `${sum["핵심교양"] || 0} / ${req["핵심교양"] || 0}`;
+      document.getElementById('req-creative').textContent = `${sum["창의교양"] || 0} / ${req["창의교양"] || 0}`;
+      document.getElementById('req-major-req').textContent = `${sum["전공필수"] || 0} / ${req["전공필수"] || 0}`;
+      document.getElementById('req-major-elec').textContent = `${sum["전공선택"] || 0} / ${req["전공선택"] || 0}`;
+      document.getElementById('req-total').textContent = `${tCredit} / ${req["졸업인정학점"] || 0}`;
+      document.getElementById('req-gpa').textContent = tCredit ? (tScore / tCredit).toFixed(2) : "0.00";
+    }
+    renderSummary();
+
+    // 성적입력 팝업
+    function showSemesterPopup() {
+      document.getElementById('popup-dim').style.display = 'block';
+      document.getElementById('semester-input-popup').style.display = 'block';
+      document.getElementById('semesterForm').reset();
+    }
+    function closeSemesterPopup() {
+      document.getElementById('popup-dim').style.display = 'none';
+      document.getElementById('semester-input-popup').style.display = 'none';
+    }
+    document.getElementById('popup-dim').onclick = closeSemesterPopup;
+    function getSemesterList() {
+      return JSON.parse(localStorage.getItem('thisSemesterGrades') || '[]');
+    }
+    function setSemesterList(arr) {
+      localStorage.setItem('thisSemesterGrades', JSON.stringify(arr));
+    }
+    document.getElementById('semesterForm').onsubmit = function (e) {
+      e.preventDefault();
+      let subject = document.getElementById('popup-subject').value.trim();
+      let division = document.getElementById('popup-division').value.trim();
+      let credit = document.getElementById('popup-credit').value.trim();
+      if (!subject || !division || !credit) return;
+      let grades = JSON.parse(localStorage.getItem('grades') || '[]');
+      grades.push({ subject, division, credit });
+      localStorage.setItem('grades', JSON.stringify(grades));
+      let sem = JSON.parse(localStorage.getItem('thisSemesterGrades') || '[]');
+      sem.push({ subject, division, credit });
+      localStorage.setItem('thisSemesterGrades', JSON.stringify(sem));
+      renderSummary();
+      renderSemesterList();
+      closeSemesterPopup();
+    };
+    // 표 작성 및 수정/삭제 기능
+    let editIdx = -1;
+    function renderSemesterList() {
+      let arr = getSemesterList();
+      let tbody = document.getElementById('semesterTbody');
+      if (arr.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-row">이번학기 과목이 없습니다.</td></tr>`;
+      } else {
+        tbody.innerHTML = arr.map((row, idx) => (editIdx === idx
+          ? `<tr>
+               <td><input value="${row.subject}" id="edit-subject"></td>
+               <td>
+                 <select id="edit-division">
+                   <option>기초교양</option>
+                   <option>핵심교양</option>
+                   <option>창의교양</option>
+                   <option>전공필수</option>
+                   <option>전공선택</option>
+                   <option>기타</option>
+                 </select>
+               </td>
+               <td><input value="${row.credit}" type="number" id="edit-credit"></td>
+               <td>
+                 <button onclick="saveSemesterEdit(${idx})">저장</button>
+                 <button onclick="cancelSemesterEdit()">취소</button>
+               </td>
+             </tr>`
+          : `<tr>
+               <td>${row.subject}</td>
+               <td>${row.division}</td>
+               <td>${row.credit}</td>
+               <td>
+                 <button onclick="editSemesterRow(${idx})">수정</button>
+                 <button onclick="deleteSemesterRow(${idx})">삭제</button>
+               </td>
+             </tr>`
+        )).join('');
+        if (editIdx > -1 && arr[editIdx]) {
+          document.getElementById('edit-division').value = arr[editIdx].division;
+        }
+      }
+    }
+    window.editSemesterRow = function (idx) {
+      editIdx = idx;
+      renderSemesterList();
+    };
+    window.cancelSemesterEdit = function () {
+      editIdx = -1;
+      renderSemesterList();
+    };
+    window.saveSemesterEdit = function (idx) {
+      let arr = getSemesterList();
+      let old = { ...arr[idx] };
+      let subject = document.getElementById('edit-subject').value.trim();
+      let division = document.getElementById('edit-division').value.trim();
+      let credit = document.getElementById('edit-credit').value.trim();
+      arr[idx] = { subject, division, credit };
+      setSemesterList(arr);
+      // grades 동기화
+      let grades = JSON.parse(localStorage.getItem('grades') || '[]');
+      let gidx = grades.findIndex(
+        g => g.subject === old.subject && g.division === old.division && g.credit === old.credit
+      );
+      if (gidx !== -1) {
+        grades[gidx] = { subject, division, credit };
+        localStorage.setItem('grades', JSON.stringify(grades));
+      }
+      editIdx = -1;
+      renderSemesterList();
+      renderSummary();
+    };
+    window.deleteSemesterRow = function (idx) {
+      let arr = getSemesterList();
+      if (confirm('정말 삭제할까요?')) {
+        let grades = JSON.parse(localStorage.getItem('grades') || '[]');
+        let { subject, division, credit } = arr[idx];
+        let gidx = grades.findIndex(
+          g => g.subject === subject && g.division === division && g.credit === credit
+        );
+        if (gidx !== -1) {
+          grades.splice(gidx, 1);
+          localStorage.setItem('grades', JSON.stringify(grades));
+        }
+        arr.splice(idx, 1);
+        setSemesterList(arr);
+        editIdx = -1;
+        renderSemesterList();
+        renderSummary();
+      }
+    };
+    renderSemesterList();
+  </script>
+</body>
+
+</html>

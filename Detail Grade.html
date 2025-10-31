@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>성적상세</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background: #fafdff;
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            border-bottom: 1px solid #d2e1ed;
+            padding: 32px 60px 14px 60px;
+            box-sizing: border-box;
+        }
+
+        .logo-title {
+            font-size: 2.2em;
+            font-weight: bold;
+            letter-spacing: -2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: flex-end;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            color: #222;
+            text-decoration: none;
+            font-size: 1.13em;
+            padding: 2px 12px 0 12px;
+            border-bottom: 1.5px dotted #bbb;
+            border-radius: 0;
+            transition: background 0.13s;
+        }
+
+        .nav-menu a:hover {
+            background: #e9f1ff;
+        }
+
+        h2 {
+            font-size: 2.4em;
+            font-weight: bold;
+            margin: 48px 0 30px 70px;
+        }
+
+        .detail-table-wrap {
+            width: 90vw;
+            max-width: 1100px;
+            min-width: 670px;
+            margin: 0 auto 56px auto;
+            background: #fff;
+            border-radius: 7px;
+            box-shadow: 0 1px 12px rgba(80, 102, 121, 0.08);
+            padding: 34px 26px;
+        }
+
+        table.detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        table.detail-table th,
+        table.detail-table td {
+            border: 1.2px solid #c7d1db;
+            padding: 13px 5px;
+            font-size: 1.07em;
+            text-align: center;
+            min-width: 74px;
+        }
+
+        table.detail-table th {
+            background: #f7faff;
+            font-weight: 600;
+        }
+
+        .grade-section-title {
+            font-size: 1.12em;
+            font-weight: bold;
+            background: #eef3ff;
+        }
+
+        .btn-action {
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.98em;
+            padding: 5px 16px;
+            margin: 0 0.5px;
+        }
+
+        .btn-mod {
+            background: #5191e3;
+            color: #fff;
+        }
+
+        .btn-save {
+            background: #3bc95a;
+            color: #fff;
+        }
+
+        .btn-cancel {
+            background: #aaa;
+            color: #fff;
+        }
+
+        .btn-del {
+            background: #ea5555;
+            color: #fff;
+        }
+
+        input.cell-edit,
+        select.cell-edit {
+            font-size: 1em;
+            padding: 4px 8px;
+            width: 84%;
+            border: 1.2px solid #8ea8b9;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-bar">
+        <div class="logo-title">성적상세</div>
+        <nav class="nav-menu">
+            <a href="Menu.html">홈</a>
+            <a href="Detail Grade.html">성적상세</a>
+            <a href="Enter Grade.html">성적입력</a>
+        </nav>
+    </div>
+    <div class="detail-table-wrap" id="detailBox"></div>
+
+    <script>
+        const years = ['1학년', '2학년', '3학년', '4학년'];
+        let grades = JSON.parse(localStorage.getItem('grades') || '[]');
+        let editIndex = -1;
+
+        function renderDetail() {
+            const grouped = {};
+            years.forEach(y => grouped[y] = []);
+            grades.forEach((item, idx) => {
+                if (grouped[item.year]) grouped[item.year].push({ ...item, _idx: idx });
+            });
+
+            let html = '';
+            years.forEach(year => {
+                html += `<div><div class="grade-section-title">${year}</div><table class="detail-table">
+        <thead>
+          <tr>
+            <th>학기</th><th>과목명</th><th>이수구분</th><th>이수학점</th><th>등급</th><th>수정/삭제</th>
+          </tr>
+        </thead><tbody>`;
+                if (!grouped[year].length) {
+                    html += `<tr><td colspan="6" style="color:#bbb;">입력된 데이터 없음</td></tr>`;
+                } else {
+                    grouped[year].forEach(item => {
+                        if (editIndex === item._idx) {
+                            html += `<tr>
+              <td><select class="cell-edit" id="edit-semester"><option>1학기</option><option>2학기</option></select></td>
+              <td><input class="cell-edit" id="edit-subject" value="${item.subject || ''}"></td>
+              <td><select class="cell-edit" id="edit-division">
+                <option>기초교양</option><option>핵심교양</option><option>창의교양</option><option>전공필수</option><option>전공선택</option><option>기타</option>
+              </select></td>
+              <td><input class="cell-edit" id="edit-credit" type="number" value="${item.credit || ''}"></td>
+              <td><select class="cell-edit" id="edit-grade"><option>A+</option><option>A</option><option>B+</option><option>B</option><option>C+</option><option>C</option><option>F</option></select></td>
+              <td>
+                <button class="btn-action btn-save" onclick="saveEdit(${item._idx})">저장</button>
+                <button class="btn-action btn-cancel" onclick="cancelEdit()">취소</button>
+              </td>
+            </tr>`;
+                        } else {
+                            html += `<tr>
+              <td>${item.semester || ''}</td>
+              <td>${item.subject || ''}</td>
+              <td>${item.division || ''}</td>
+              <td>${item.credit || ''}</td>
+              <td>${item.grade || ''}</td>
+              <td>
+                <button class="btn-action btn-mod" onclick="startEdit(${item._idx})">수정</button>
+                <button class="btn-action btn-del" onclick="deleteRow(${item._idx})">삭제</button>
+              </td>
+            </tr>`;
+                        }
+                    });
+                }
+                html += `</tbody></table></div><br>`;
+            });
+            document.getElementById('detailBox').innerHTML = html;
+
+            if (editIndex !== -1) {
+                const editItem = grades[editIndex];
+                if (editItem) {
+                    document.getElementById('edit-semester').value = editItem.semester || '';
+                    document.getElementById('edit-division').value = editItem.division || '';
+                    document.getElementById('edit-grade').value = editItem.grade || '';
+                }
+            }
+        }
+
+        window.startEdit = function (idx) {
+            editIndex = idx;
+            renderDetail();
+        }
+        window.saveEdit = function (idx) {
+            grades[idx].semester = document.getElementById('edit-semester').value;
+            grades[idx].subject = document.getElementById('edit-subject').value.trim();
+            grades[idx].division = document.getElementById('edit-division').value;
+            grades[idx].credit = document.getElementById('edit-credit').value.trim();
+            grades[idx].grade = document.getElementById('edit-grade').value;
+            localStorage.setItem('grades', JSON.stringify(grades));
+            editIndex = -1;
+            renderDetail();
+        }
+        window.cancelEdit = function () {
+            editIndex = -1;
+            renderDetail();
+        }
+        window.deleteRow = function (idx) {
+            if (confirm('정말 삭제할까요?')) {
+                grades.splice(idx, 1);
+                localStorage.setItem('grades', JSON.stringify(grades));
+                editIndex = -1;
+                renderDetail();
+            }
+        }
+
+        renderDetail();
+    </script>
+</body>
+
+</html>

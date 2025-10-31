@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>성적 입력</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background: #fafbfc;
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            border-bottom: 1px solid #d2e1ed;
+            padding: 32px 60px 14px 60px;
+            box-sizing: border-box;
+        }
+
+        .logo-title {
+            font-size: 2.2em;
+            font-weight: bold;
+            letter-spacing: -2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: flex-end;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            color: #222;
+            text-decoration: none;
+            font-size: 1.13em;
+            padding: 2px 12px 0 12px;
+            border-bottom: 1.5px dotted #bbb;
+            border-radius: 0;
+            transition: background 0.13s;
+        }
+
+        .nav-menu a:hover {
+            background: #e9f1ff;
+        }
+
+        h2 {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 48px 0 28px 80px;
+        }
+
+        .grade-input-table-wrap {
+            width: 84vw;
+            max-width: 960px;
+            min-width: 650px;
+            margin: 30px auto 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0.5px 10px 0 rgba(80, 102, 121, 0.07);
+        }
+
+        table.grade-input-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            background: #fff;
+        }
+
+        .grade-input-table th,
+        .grade-input-table td {
+            border: 1.5px solid #999;
+            padding: 16px 7px;
+            font-size: 1.13em;
+            text-align: center;
+            min-width: 90px;
+        }
+
+        .grade-input-table input,
+        .grade-input-table select {
+            font-size: 1em;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 90%;
+        }
+
+        .grade-input-table select {
+            min-width: 70px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-bar">
+        <div class="logo-title">성적 입력</div>
+        <nav class="nav-menu">
+            <a href="Menu.html">홈</a>
+            <a href="Detail Grade.html">성적상세</a>
+            <a href="Enter Grade.html">성적입력</a>
+        </nav>
+    </div>
+
+    <div class="grade-input-table-wrap">
+        <form id="gradeForm" autocomplete="off" style="margin:0;">
+            <table class="grade-input-table">
+                <thead>
+                    <tr>
+                        <th>학년</th>
+                        <th>학기</th>
+                        <th>과목명</th>
+                        <th>이수구분</th>
+                        <th>이수학점</th>
+                        <th>등급</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select id="year" required>
+                                <option value="">선택</option>
+                                <option>1학년</option>
+                                <option>2학년</option>
+                                <option>3학년</option>
+                                <option>4학년</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="semester" required>
+                                <option value="">선택</option>
+                                <option>1학기</option>
+                                <option>2학기</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input id="subject" required placeholder="과목명" />
+                        </td>
+                        <td>
+                            <select id="division" required>
+                                <option value="">선택</option>
+                                <option>기초교양</option>
+                                <option>핵심교양</option>
+                                <option>창의교양</option>
+                                <option>전공필수</option>
+                                <option>전공선택</option>
+                                <option>기타</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input id="credit" type="number" min="0" required placeholder="학점" />
+                        </td>
+                        <td>
+                            <select id="grade" required>
+                                <option value="">선택</option>
+                                <option>A+</option>
+                                <option>A</option>
+                                <option>B+</option>
+                                <option>B</option>
+                                <option>C+</option>
+                                <option>C</option>
+                                <option>F</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="text-align:center; margin:34px 0 28px 0;">
+                <button type="submit"
+                    style="padding:10px 32px; background:#356beb; color:white; font-size:1.17em; border:none; border-radius:6px; cursor:pointer;">
+                    입력
+                </button>
+            </div>
+        </form>
+    </div>
+    <script>
+        const form = document.getElementById("gradeForm");
+        let grades = JSON.parse(localStorage.getItem("grades") || "[]");
+
+        form.onsubmit = function (e) {
+            e.preventDefault();
+            const year = form.year.value.trim();
+            const semester = form.semester.value.trim();
+            const subject = form.subject.value.trim();
+            const division = form.division.value.trim();
+            const credit = form.credit.value.trim();
+            const grade = form.grade.value.trim();
+
+            if (!year || !semester || !subject || !division || !credit || !grade) return;
+
+            grades.push({ year, semester, subject, division, credit, grade });
+            localStorage.setItem("grades", JSON.stringify(grades));
+            alert("저장되었습니다!");
+            form.reset();
+        };
+    </script>
+</body>
+
+</html>
